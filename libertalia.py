@@ -10,16 +10,17 @@ display_height = 700
 game_display = pygame.display.set_mode((display_width, display_height), pygame.RESIZABLE)
 
 intro_background = pygame.image.load('intro_background2.jpg')
+about_background = pygame.image.load('intro_background.jpg')
 button_background = pygame.image.load('button_background.png')
 
 # COLORS
-white = pygame.Color(255,255,255)
-black = pygame.Color(0,0,0)
-red = pygame.Color(200,0,0)
-bright_red = pygame.Color(255,0,0)
-green = pygame.Color(0,200,0)
-bright_green = pygame.Color(0,255,0)
-blue = pygame.Color(0,0,255)
+white = (255,255,255)
+black = (0,0,0)
+red = (175,0,0)
+bright_red = (255,0,0)
+green = (0,200,0)
+bright_green = (0,255,0)
+blue = (0,0,255)
 
 def text_objects(text, font, color=black):
     text_surface = font.render(text, True, color)
@@ -29,15 +30,27 @@ def button(msg, x, y, width, height, action=None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
+    screen_surf = game_display.get_rect()
+    small_text = pygame.font.Font('PirataOne-Regular.ttf', int(screen_surf[2] / 40))
+    img_surf = pygame.transform.scale(button_background, (int(screen_surf[2] / 6), int(screen_surf[3] / 8)))
+    img_rect = img_surf.get_rect()
+    img_rect.center = ((x + (width / 2)), (y + (height / 2)))
+
+    # Button hovering
     if x + width > mouse[0] > x and y + height > mouse[1] > y:
+        text_surf, text_rect = text_objects(msg, small_text, red)
         if click[0] == 1 and action != None:
             action()
+    else:
+        text_surf, text_rect = text_objects(msg, small_text, black)
 
-    small_text = pygame.font.Font('PirataOne-Regular.ttf', 20)
-    text_surf, text_rect = text_objects(msg, small_text)
-    text_rect.center = ((x + (width / 2)), (y + (height / 2)))
-    #button_img = game_display.blit(button_background, text_rect)
+    text_rect.center = ((x + (width / 2)), (y + (height / 2.5)))
+    game_display.blit(img_surf, img_rect)
     game_display.blit(text_surf, text_rect)
+
+def about():
+    screen_surf = game_display.get_rect()
+    pygame.draw.rect(game_display, white, [screen_surf[2] / 85, screen_surf[3] / 4, screen_surf[2] / 10 * 7, screen_surf[3] / 10 * 7])
 
 def quitgame():
     pygame.quit()
@@ -66,20 +79,10 @@ def game_intro():
         text_rect.center = ((screen_surf[2] / 1.3), (screen_surf[3] / 8))
         game_display.blit(text_surf, text_rect)
 
-        # Button images
-        game_display.blit(pygame.transform.scale(button_background, (int(screen_surf[2] / 6), int(screen_surf[3] / 8))),
-                          ((screen_surf[2] / 1.4), (screen_surf[3] / 4)))
-        game_display.blit(pygame.transform.scale(button_background, (int(screen_surf[2] / 6), int(screen_surf[3] / 8))),
-                          ((screen_surf[2] / 1.4), (screen_surf[3] / 4)))
-        game_display.blit(pygame.transform.scale(button_background, (int(screen_surf[2] / 6), int(screen_surf[3] / 8))),
-                          ((screen_surf[2] / 1.4), (screen_surf[3] / 4)))
-        game_display.blit(pygame.transform.scale(button_background, (int(screen_surf[2] / 6), int(screen_surf[3] / 8))),
-                          ((screen_surf[2] / 1.4), (screen_surf[3] / 4)))
-
-        button('Cast Off!', (screen_surf[2] / 1.3), (screen_surf[3] / 6), 50, 50, game_loop)
-        button('About', ((display_width / 4) * 2), 450, 100, 50, quitgame)
-        button('Controls', ((display_width / 4) * 2.5), 450, 100, 50, quitgame)
-        button('Quit', ((display_width / 4) * 3), 450, 100, 50, quitgame)
+        button('Cast Off!', (screen_surf[2] / 1.25), (screen_surf[3] / 4), 50, 50, game_loop)
+        button('About', (screen_surf[2] / 1.25), (screen_surf[3] / 2.65), 50, 50, about)
+        button('Controls', (screen_surf[2] / 1.25), (screen_surf[3] / 2), 50, 50, quitgame)
+        button('Quit', (screen_surf[2] / 1.25), (screen_surf[3] / 1.6), 50, 50, quitgame)
 
         pygame.display.update()
         clock.tick(15)
