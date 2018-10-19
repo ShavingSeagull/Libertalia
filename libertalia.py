@@ -1,31 +1,10 @@
-from pygame_text_input import pygame_textinput
 import pygame
 from pygame.locals import *
+from classes import InputBox, Button, MenuButton
+from globals import *
+from data import *
 
 pygame.init()
-
-# IMAGES
-icon = pygame.image.load('logo.jpg')
-intro_background = pygame.image.load('intro_background.jpg')
-button_background = pygame.image.load('button_background.png')
-about_background = pygame.image.load('about_background.png')
-wood_background = pygame.image.load('wood_background.jpg')
-char_background = pygame.image.load('character_background.png')
-
-# FONTS
-pirata = 'PirataOne-Regular.ttf'
-respira = 'DellaRespira-Regular.ttf'
-pinyon = 'PinyonScript-Regular.ttf'
-
-# COLORS
-white = (255,255,255)
-black = (0,0,0)
-red = (175,0,0)
-bright_red = (255,0,0)
-green = (0,200,0)
-bright_green = (0,255,0)
-blue = (0,0,255)
-scroll_beige = (236, 181, 65)
 
 # GENERAL SETUP
 pygame.display.set_caption('Libertalia')
@@ -39,31 +18,30 @@ game_display = pygame.display.set_mode((info_object.current_w, info_object.curre
 screen_surf = game_display.get_rect()
 
 
-
 def text_objects(text, font, color=black):
     text_surface = font.render(text, True, color)
     return text_surface, text_surface.get_rect()
 
-def button(msg, x, y, width, height, action=None):
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-
-    small_text = pygame.font.Font(pirata, int(screen_surf[2] / 40))
-    img_surf = pygame.transform.scale(button_background, (int(screen_surf[2] / 6), int(screen_surf[3] / 8)))
-    img_rect = img_surf.get_rect()
-    img_rect.center = ((x + (width / 2)), (y + (height / 2)))
-
-    # Button hovering
-    if x + width > mouse[0] > x and y + height > mouse[1] > y:
-        text_surf, text_rect = text_objects(msg, small_text, red)
-        if click[0] == 1 and action != None:
-            action()
-    else:
-        text_surf, text_rect = text_objects(msg, small_text, black)
-
-    text_rect.center = ((x + (width / 2)), (y + (height / 2.5)))
-    game_display.blit(img_surf, img_rect)
-    game_display.blit(text_surf, text_rect)
+# def button(msg, x, y, width, height, image, action=None):
+#     mouse = pygame.mouse.get_pos()
+#     click = pygame.mouse.get_pressed()
+#
+#     small_text = pygame.font.Font(pirata, int(screen_surf[2] / 40))
+#     img_surf = pygame.transform.scale(image, (int(screen_surf[2] / 6), int(screen_surf[3] / 8)))
+#     img_rect = img_surf.get_rect()
+#     img_rect.center = ((x + (width / 2)), (y + (height / 2)))
+#
+#     # Button hovering
+#     if x + width > mouse[0] > x and y + height > mouse[1] > y:
+#         text_surf, text_rect = text_objects(msg, small_text, red)
+#         if click[0] == 1 and action != None:
+#             action()
+#     else:
+#         text_surf, text_rect = text_objects(msg, small_text, black)
+#
+#     text_rect.center = ((x + (width / 2)), (y + (height / 2.5)))
+#     game_display.blit(img_surf, img_rect)
+#     game_display.blit(text_surf, text_rect)
 
 def fade(width, height, delay):
     """
@@ -82,30 +60,6 @@ def fade(width, height, delay):
         game_display.blit(fade, (0,0))
         pygame.display.update()
         pygame.time.delay(delay)
-
-# def text_fade(text, color, font, size, display_delay, fade_delay):
-#     custom_font = pygame.font.Font(font, size)
-#     label = custom_font.render(text, 1, color)
-#     new_surf = pygame.Surface(custom_font.size(text))
-#     new_surf.blit(label,(0,0))
-#     game_display.blit(new_surf, (100,100))
-#     pygame.display.update()
-#
-#     for x in range (255):
-#         game_display.fill(black)
-#         new_surf.set_alpha(0 + x)
-#         game_display.blit(new_surf, (100,100))
-#         pygame.display.update()
-#         pygame.time.delay(fade_delay)
-#
-#     pygame.time.delay(display_delay)
-#
-#     for y in range (255):
-#         game_display.fill(black)
-#         new_surf.set_alpha(255 - y)
-#         game_display.blit(new_surf, (100,100))
-#         pygame.display.update()
-#         pygame.time.delay(fade_delay)
 
 def blit_text(surface, text, pos, font, size, buffer, color=black, fade=False, display_delay=3000, fade_delay=10):
     """
@@ -200,7 +154,7 @@ def game_loop_intro_text():
     )
 
 def about():
-    # WILL NEED TO BLIT THE INTRO BACKGROUND HERE IF YOU HAVE MORE OPTIONS THAN JUST 'ABOUT'
+    # WILL NEED TO BLIT THE INTRO BACKGROUND HERE TO CLEAR THE SCREEN IF YOU HAVE MORE OPTIONS THAN JUST 'ABOUT'
     # OTHERWISE THE ABOUT SCROLL WILL REMAIN ON THE SCREEN WHEN YOU CHOOSE ANOTHER OPTION
     text = "Libertalia is a game inspired by the fabled location of Libertalia, Madagascar.\n\nSupposedly founded by " \
            "Captain James Misson (although other reports cite Henry Avery), Libertalia functioned as a pirate utopia, " \
@@ -221,19 +175,34 @@ def quitgame():
 def game_intro():
     intro = True
     game_display.blit(pygame.transform.scale(intro_background, (info_object.current_w, info_object.current_h)), (0, 0))
+    screen_surface = game_display.get_rect()
+    play_button = MenuButton(
+        (screen_surface[2] / 100) * 70,
+        screen_surface[3] / 4,
+        (screen_surface[2] / 100) * 20,
+        (screen_surface[3] / 100) * 10,
+        pirata,
+        int((screen_surface[2] / 100)* 2.5),
+        button_background,
+        'Cast Off!',
+        game_loop
+    )
+    buttons = [play_button]
 
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            for button in buttons:
+                button.handle_event(event)
 
             # if event.type == VIDEORESIZE:
             #     game_display = pygame.display.set_mode(event.dict['size'], RESIZABLE)
             #     game_display.blit(pygame.transform.scale(intro_background, event.dict['size']), (0, 0))
             #     pygame.display.update()
 
-        screen_surface = game_display.get_rect()
+
         # Sets the font size as a percentage of the screen width to make it dynamic
         small_text = pygame.font.Font(pirata, int(screen_surface[2] / 50))
         large_text = pygame.font.Font(pirata, int(screen_surface[2] / 10))
@@ -243,61 +212,62 @@ def game_intro():
         footer_rect.center = ((screen_surface[2] / 10), (screen_surface[3] / 10 * 9.5))
         game_display.blits(blit_sequence=((title_surf, title_rect), (footer_surf, footer_rect)))
 
-        button('Cast Off!', (screen_surface[2] / 1.25), (screen_surface[3] / 4), 50, 50, game_loop)
-        button('About', (screen_surface[2] / 1.25), (screen_surface[3] / 2.65), 50, 50, about)
-        button('Controls', (screen_surface[2] / 1.25), (screen_surface[3] / 2), 50, 50, quitgame)
-        button('Quit', (screen_surface[2] / 1.25), (screen_surface[3] / 1.6), 50, 50, quitgame)
+        play_button.draw(game_display)
+
+        # button('Cast Off!', (screen_surface[2] / 1.25), (screen_surface[3] / 4), 50, 50, button_background, game_loop)
+        # button('About', (screen_surface[2] / 1.25), (screen_surface[3] / 2.65), 50, 50, button_background, about)
+        # button('Controls', (screen_surface[2] / 1.25), (screen_surface[3] / 2), 50, 50, button_background, quitgame)
+        # button('Quit', (screen_surface[2] / 1.25), (screen_surface[3] / 1.6), 50, 50, button_background, quitgame)
+
+
 
         pygame.display.update()
         clock.tick(15)
-
-def char_creation_text_input(surface, pos):
-    while True:
-        events = pygame.event.get()
-        text_input = pygame_textinput.TextInput(" ", pirata, int(screen_surf[2] / 50), 0, black, black)
-        text_input.update(events)
-        surface.blit(text_input.get_surface(), (pos))
-        pygame.display.update()
-        clock.tick(15)
-        if text_input.update(events):
-            input = text_input.get_text()
-            return input
 
 def character_creation():
     """
     Function for creating the playable character and ship.
     """
+    name_input = InputBox((screen_surf[2] / 100) * 42, (screen_surf[3] / 100) * 30, 200, 30, pirata, int(screen_surf[2] / 50))
+    age_input = InputBox((screen_surf[2] / 100) * 42, (screen_surf[3] / 100) * 35, 200, 30, pirata, int(screen_surf[2] / 50))
+    input_boxes = [name_input, age_input]
+
+    header_text = pygame.font.Font(pirata, int(screen_surf[2] / 25))
+    label_text = pygame.font.Font(pirata, int(screen_surf[2] / 50))
+    header = header_text.render('Character Creation', 0, black)
+    header_rect = header.get_rect()
+
+    name = label_text.render('Pirate Name:', 0, black)
+    age = label_text.render('Age:', 0, black)
+
     run = True
     while run:
+
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            for box in input_boxes:
+                box.handle_event(event)
+
+        for box in input_boxes:
+            box.update()
 
         game_display.blit(wood_background, (0, 0))
-        game_display.blit(pygame.transform.scale(char_background, (int(screen_surf[2] / 4 * 2), int(screen_surf[3] / 100 * 90))),
-                          (screen_surf[2] / 4, screen_surf[3] / 100 * 5))
-
-        header_text = pygame.font.Font(pirata, int(screen_surf[2] / 25))
-        label_text = pygame.font.Font(pirata, int(screen_surf[2] / 50))
-        header = header_text.render('Character Creation', 0, black)
-        header_rect = header.get_rect()
-
-        name = label_text.render('Pirate Name:', 0, black)
-        age = label_text.render('Age:', 0, black)
-
+        game_display.blit(
+            pygame.transform.scale(char_background, (int(screen_surf[2] / 4 * 2), int(screen_surf[3] / 100 * 90))),
+            (screen_surf[2] / 4, screen_surf[3] / 100 * 5))
 
         game_display.blit(header, (screen_surf[2] / 2 - header_rect[2] / 2, screen_surf[3] / 100 * 18))
         game_display.blit(name, (screen_surf[2] / 100 * 32, screen_surf[3] / 100 * 30))
         game_display.blit(age, (screen_surf[2] / 100 * 32, screen_surf[3] / 100 * 35))
 
-        pygame.display.update()
+        for box in input_boxes:
+            box.draw(game_display)
 
-        char_creation_text_input(game_display, (screen_surf[2] / 100 * 45, screen_surf[3] / 100 * 30))
-
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(30)
 
 def game_loop():
     game_exit = False
@@ -309,11 +279,11 @@ def game_loop():
                 quit()
 
         fade(info_object.current_w, info_object.current_h, 8)
-        game_loop_intro_text()
+        #game_loop_intro_text()
         character_creation()
 
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(30)
 
 game_intro()
 game_loop()
