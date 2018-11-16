@@ -2,16 +2,18 @@ import pygame
 
 # IMAGES
 icon = pygame.image.load('logo.jpg')
-intro_background = pygame.image.load('intro_background.jpg')
-button_background = pygame.image.load('button_background.png')
-about_background = pygame.image.load('about_background.png')
-wood_background = pygame.image.load('wood_background.jpg')
-char_background = pygame.image.load('character_background.png')
+intro_background = pygame.image.load('images/intro_background.jpg')
+button_background = pygame.image.load('images/button_background.png')
+about_background = pygame.image.load('images/about_background.png')
+wood_background = pygame.image.load('images/char_creation_background.jpg')
+char_background = pygame.image.load('images/char_creation_scroll.png')
+close_button_img = pygame.image.load('images/close_button.png')
+skel_hand_right = pygame.image.load('images/skeleton_hand_right.png')
 
 # FONTS
-pirata = 'PirataOne-Regular.ttf'
-respira = 'DellaRespira-Regular.ttf'
-pinyon = 'PinyonScript-Regular.ttf'
+pirata = 'fonts/PirataOne-Regular.ttf'
+respira = 'fonts/DellaRespira-Regular.ttf'
+pinyon = 'fonts/PinyonScript-Regular.ttf'
 
 # COLORS
 white = (255,255,255)

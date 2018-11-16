@@ -1,5 +1,6 @@
 import pygame
 from globals import *
+from user_data import nations
 
 class InputBox:
 
@@ -8,7 +9,8 @@ class InputBox:
         self.color = black
         self.rect_color = black
         self.text = text
-        self.font = pygame.font.Font(font, size)
+        self.size = int(size)
+        self.font = pygame.font.Font(font, self.size)
         self.txt_surface = self.font.render(text, True, self.color)
         self.active = False
 
@@ -33,20 +35,23 @@ class InputBox:
                 # Re-render the text.
                 self.txt_surface = self.font.render(self.text, True, self.color)
 
+    def return_input(self):
+        return self.text
+
     def update(self):
         # Resize the box if the text is too long.
         width = max(200, self.txt_surface.get_width()+10)
         self.rect.w = width
 
-    def draw(self, screen):
+    def draw(self, surface):
         # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        surface.blit(self.txt_surface, (self.rect.x+5, self.rect.y+1))
         # Blit the rect.
-        pygame.draw.rect(screen, self.rect_color, self.rect, 2)
+        pygame.draw.rect(surface, self.rect_color, self.rect, 2)
 
 class Button:
 
-    def __init__(self, x, y, w, h, font, size, image, text='', action=None):
+    def __init__(self, x, y, w, h, image, font=None, size=32, text='', action=None):
         self.x = x
         self.y = y
         self.width = int(w)
@@ -84,3 +89,33 @@ class MenuButton(Button):
             self.txt_surface, (self.img_rect[2] / 2 - self.txt_rect[2] / 2, self.img_rect[3] / 2 - (self.txt_rect[3] / 100) * 60)
         )
         surface.blit(self.img_surface, (self.x, self.y))
+
+class NationSelect:
+    def __init__(self, x, y, font, text, size, nation):
+        self.x = x
+        self.y = y
+        self.color = black
+        self.text = text
+        self.size = int(size)
+        self.font = pygame.font.Font(font, self.size)
+        self.nation = nation
+
+    def handle_event(self, event):
+        self.mouse = pygame.mouse.get_pos()
+        if nations[self.nation] == True:
+            self.color = red
+        else:
+            self.color = black
+
+        if self.x + self.txt_rect[2] > self.mouse[0] > self.x and self.y + self.txt_rect[3] > self.mouse[1] > self.y:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if nations[self.nation] == False:
+                    for i in nations:
+                        if nations[i] == True:
+                            nations[i] = False
+                    nations[self.nation] = True
+
+    def draw(self, surface):
+        self.txt_surface = self.font.render(self.text, True, self.color)
+        self.txt_rect = self.txt_surface.get_rect()
+        surface.blit(self.txt_surface, (self.x, self.y))

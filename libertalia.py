@@ -1,8 +1,8 @@
 import pygame
 from pygame.locals import *
-from classes import InputBox, Button, MenuButton
+from classes import *
 from globals import *
-from data import *
+from user_data import *
 
 pygame.init()
 
@@ -16,7 +16,6 @@ display_height = 700
 game_display = pygame.display.set_mode((info_object.current_w, info_object.current_h), pygame.FULLSCREEN)
 #game_display = pygame.display.set_mode((display_width, display_height), pygame.RESIZABLE)
 screen_surf = game_display.get_rect()
-
 
 def text_objects(text, font, color=black):
     text_surface = font.render(text, True, color)
@@ -163,12 +162,13 @@ def about():
            " country, too?\n\nAs a player, your goal is to trade and pillage your way " \
            "across the Caribbean, amassing your fortune while staying out of the hands of the European authorities!"
 
-    img_surf = pygame.transform.scale(about_background, (int(screen_surf[2] / 10 * 7), int(screen_surf[3] / 10 * 7)))
-    img_rect = img_surf.get_rect()
-    blit_text(img_surf, text, (0, img_rect[3] / 8 * 1), respira, int(screen_surf[2] / 60), int((screen_surf[2] / 100) * 5))
-    game_display.blit(img_surf, (screen_surf[2] / 85, screen_surf[3] / 4))
+    bg_surf = pygame.transform.scale(about_background, (int((screen_surf[2] / 10) * 7), int((screen_surf[3] / 10) * 7)))
+    bg_rect = bg_surf.get_rect()
 
-def quitgame():
+    blit_text(bg_surf, text, (0, bg_rect[3] / 8 * 1), respira, int(screen_surf[2] / 60), int((screen_surf[2] / 100) * 5))
+    game_display.blit(bg_surf, (screen_surf[2] / 85, (screen_surf[3] / 100) * 22))
+
+def quit_game():
     pygame.quit()
     quit()
 
@@ -176,26 +176,69 @@ def game_intro():
     intro = True
     game_display.blit(pygame.transform.scale(intro_background, (info_object.current_w, info_object.current_h)), (0, 0))
     screen_surface = game_display.get_rect()
+    button_x = (screen_surface[2] / 100) * 70
+    button_w = (screen_surface[2] / 100) * 20
+    button_h = (screen_surface[3] / 100) * 10
+    button_font_size = int((screen_surface[2] / 100) * 2.5)
+    button_rect = close_button_img.get_rect()
+
     play_button = MenuButton(
-        (screen_surface[2] / 100) * 70,
-        screen_surface[3] / 4,
-        (screen_surface[2] / 100) * 20,
-        (screen_surface[3] / 100) * 10,
-        pirata,
-        int((screen_surface[2] / 100)* 2.5),
+        button_x,
+        (screen_surface[3] / 100) * 25,
+        button_w,
+        button_h,
         button_background,
+        pirata,
+        button_font_size,
         'Cast Off!',
         game_loop
     )
-    buttons = [play_button]
+    about_button = MenuButton(
+        button_x,
+        (screen_surface[3] / 100) * 36,
+        button_w,
+        button_h,
+        button_background,
+        pirata,
+        button_font_size,
+        'About',
+        about
+    )
+    quit_button = MenuButton(
+        button_x,
+        (screen_surface[3] / 100) * 47,
+        button_w,
+        button_h,
+        button_background,
+        pirata,
+        button_font_size,
+        'Quit',
+        quit_game
+    )
+    close_button = Button(
+        (screen_surface[2] / 100) * 58,
+        (screen_surface[3] / 100) * 76,
+        button_rect[2],
+        button_rect[3],
+        close_button_img,
+        action=game_intro
+    )
+    buttons = [play_button, about_button, quit_button, close_button]
 
     while intro:
+        mouse = pygame.mouse.get_pos()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             for button in buttons:
                 button.handle_event(event)
+                # Only draws the close button for the about picture if the button is clicked
+                if about_button.x + about_button.width > mouse[0] > about_button.x and about_button.y + about_button.height > \
+                        mouse[1] > about_button.y:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        close_button.draw(game_display)
 
             # if event.type == VIDEORESIZE:
             #     game_display = pygame.display.set_mode(event.dict['size'], RESIZABLE)
@@ -213,24 +256,80 @@ def game_intro():
         game_display.blits(blit_sequence=((title_surf, title_rect), (footer_surf, footer_rect)))
 
         play_button.draw(game_display)
-
-        # button('Cast Off!', (screen_surface[2] / 1.25), (screen_surface[3] / 4), 50, 50, button_background, game_loop)
-        # button('About', (screen_surface[2] / 1.25), (screen_surface[3] / 2.65), 50, 50, button_background, about)
-        # button('Controls', (screen_surface[2] / 1.25), (screen_surface[3] / 2), 50, 50, button_background, quitgame)
-        # button('Quit', (screen_surface[2] / 1.25), (screen_surface[3] / 1.6), 50, 50, button_background, quitgame)
-
-
+        about_button.draw(game_display)
+        quit_button.draw(game_display)
 
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(30)
 
 def character_creation():
     """
     Function for creating the playable character and ship.
     """
-    name_input = InputBox((screen_surf[2] / 100) * 42, (screen_surf[3] / 100) * 30, 200, 30, pirata, int(screen_surf[2] / 50))
-    age_input = InputBox((screen_surf[2] / 100) * 42, (screen_surf[3] / 100) * 35, 200, 30, pirata, int(screen_surf[2] / 50))
-    input_boxes = [name_input, age_input]
+    label_width = (screen_surf[2] / 100) * 32
+
+    input_x = (screen_surf[2] / 100) * 42
+    input_width = 200
+    input_height = 30
+    input_font_size = screen_surf[2] / 50
+
+    nation_y = (screen_surf[3] / 100) * 40.5
+    nation_font_size = screen_surf[2] / 60
+
+    name_input = InputBox(input_x, (screen_surf[3] / 100) * 30, input_width, input_height, pirata, input_font_size)
+    age_input = InputBox(input_x, (screen_surf[3] / 100) * 35, input_width, input_height, pirata, input_font_size)
+    ship_name_input = InputBox(input_x, (screen_surf[3] / 100) * 45, input_width, input_height, pirata, input_font_size)
+    input_boxes = [name_input, age_input, ship_name_input]
+
+    def next_screen():
+        global char_name
+        global age
+        global ship_name
+
+        char_name = name_input.return_input()
+        age = age_input.return_input()
+        ship_name = ship_name_input.return_input()
+
+    british = NationSelect((screen_surf[2] / 100) * 42,
+                           nation_y,
+                           pirata,
+                           'British',
+                           nation_font_size,
+                           'british',
+                           )
+
+    dutch = NationSelect((screen_surf[2] / 100) * 47.5,
+                         nation_y,
+                         pirata,
+                         'Dutch',
+                         nation_font_size,
+                         'dutch',
+                         )
+
+    spanish = NationSelect((screen_surf[2] / 100) * 52.5,
+                           nation_y,
+                           pirata,
+                           'Spanish',
+                           nation_font_size,
+                           'spanish',
+                           )
+
+    french = NationSelect((screen_surf[2] / 100) * 59,
+                          nation_y,
+                          pirata,
+                          'French',
+                          nation_font_size,
+                          'french',
+                          )
+    nation_boxes = [british, dutch, spanish, french]
+
+    next_button = Button((screen_surf[2] / 100) * 62,
+                         (screen_surf[3] / 100) * 77,
+                         (screen_surf[2] / 100) * 7,
+                         (screen_surf[3] / 100) * 5,
+                         skel_hand_right,
+                         action=next_screen
+    )
 
     header_text = pygame.font.Font(pirata, int(screen_surf[2] / 25))
     label_text = pygame.font.Font(pirata, int(screen_surf[2] / 50))
@@ -239,35 +338,57 @@ def character_creation():
 
     name = label_text.render('Pirate Name:', 0, black)
     age = label_text.render('Age:', 0, black)
+    nationality = label_text.render('Nationality:', 0, black)
+    ship_name = label_text.render('Ship Name:', 0, black)
 
     run = True
     while run:
+
+        # Have to blit the contents first so that the event handler in the NationSelect class has a txt_rect
+        # measurement populated to work with in accordance with its logic to change the color of the text to red or black.
+        # Running the handler first means it's looking for a txt_rect measurement that doesn't yet exist - causing errors
+
+        game_display.blit(wood_background, (0, 0))
+        game_display.blit(
+            pygame.transform.scale(char_background, (int(screen_surf[2] / 4 * 2), int(screen_surf[3] / 100 * 90))),
+            (screen_surf[2] / 4, screen_surf[3] / 100 * 5)
+        )
+        game_display.blit(header, (screen_surf[2] / 2 - header_rect[2] / 2, screen_surf[3] / 100 * 18))
+        game_display.blit(name, (label_width, (screen_surf[3] / 100) * 30))
+        game_display.blit(age, (label_width, (screen_surf[3] / 100) * 35))
+        game_display.blit(nationality, (label_width, (screen_surf[3] / 100) * 40))
+        game_display.blit(ship_name, (label_width, (screen_surf[3] / 100) * 45))
+
+        for box in input_boxes:
+            box.draw(game_display)
+
+        for box in nation_boxes:
+            box.draw(game_display)
+
+        # for x, y in nations.items():
+        #     print(x, y)
+
+        next_button.draw(game_display)
 
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+
             for box in input_boxes:
                 box.handle_event(event)
+
+            for box in nation_boxes:
+                box.handle_event(event)
+
+            next_button.handle_event(event)
 
         for box in input_boxes:
             box.update()
 
-        game_display.blit(wood_background, (0, 0))
-        game_display.blit(
-            pygame.transform.scale(char_background, (int(screen_surf[2] / 4 * 2), int(screen_surf[3] / 100 * 90))),
-            (screen_surf[2] / 4, screen_surf[3] / 100 * 5))
-
-        game_display.blit(header, (screen_surf[2] / 2 - header_rect[2] / 2, screen_surf[3] / 100 * 18))
-        game_display.blit(name, (screen_surf[2] / 100 * 32, screen_surf[3] / 100 * 30))
-        game_display.blit(age, (screen_surf[2] / 100 * 32, screen_surf[3] / 100 * 35))
-
-        for box in input_boxes:
-            box.draw(game_display)
-
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(10)
 
 def game_loop():
     game_exit = False
