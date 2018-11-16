@@ -1,13 +1,13 @@
 import pygame
-from globals import *
+from constants import *
 from user_data import nations
 
 class InputBox:
 
     def __init__(self, x, y, w, h, font, size, text=''):
         self.rect = pygame.Rect(x, y, w, h)
-        self.color = black
-        self.rect_color = black
+        self.color = BLACK
+        self.rect_color = BLACK
         self.text = text
         self.size = int(size)
         self.font = pygame.font.Font(font, self.size)
@@ -23,7 +23,7 @@ class InputBox:
             else:
                 self.active = False
             # Change the current color of the input box.
-            self.rect_color = red if self.active else black
+            self.rect_color = RED if self.active else BLACK
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
@@ -59,7 +59,7 @@ class Button:
         self.image = image
         self.img_surface = pygame.transform.scale(image, (self.width, self.height))
         self.img_rect = self.img_surface.get_rect()
-        self.color = black
+        self.color = BLACK
         self.text = text
         self.font = pygame.font.Font(font, size)
         self.action = action
@@ -67,11 +67,11 @@ class Button:
     def handle_event(self, event):
         self.mouse = pygame.mouse.get_pos()
         if self.x + self.width > self.mouse[0] > self.x and self.y + self.height > self.mouse[1] > self.y:
-            self.color = red
+            self.color = RED
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.action()
         else:
-            self.color = black
+            self.color = BLACK
 
     def draw(self, surface):
         self.txt_surface = self.font.render(self.text, True, self.color)
@@ -94,7 +94,7 @@ class NationSelect:
     def __init__(self, x, y, font, text, size, nation):
         self.x = x
         self.y = y
-        self.color = black
+        self.color = BLACK
         self.text = text
         self.size = int(size)
         self.font = pygame.font.Font(font, self.size)
@@ -103,9 +103,9 @@ class NationSelect:
     def handle_event(self, event):
         self.mouse = pygame.mouse.get_pos()
         if nations[self.nation] == True:
-            self.color = red
+            self.color = RED
         else:
-            self.color = black
+            self.color = BLACK
 
         if self.x + self.txt_rect[2] > self.mouse[0] > self.x and self.y + self.txt_rect[3] > self.mouse[1] > self.y:
             if event.type == pygame.MOUSEBUTTONDOWN:

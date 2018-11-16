@@ -1,14 +1,14 @@
 import pygame
 from pygame.locals import *
 from classes import *
-from globals import *
+from constants import *
 from user_data import *
 
 pygame.init()
 
 # GENERAL SETUP
 pygame.display.set_caption('Libertalia')
-pygame.display.set_icon(icon)
+pygame.display.set_icon(ICON)
 clock = pygame.time.Clock()
 info_object = pygame.display.Info()
 display_width = 1200
@@ -17,7 +17,7 @@ game_display = pygame.display.set_mode((info_object.current_w, info_object.curre
 #game_display = pygame.display.set_mode((display_width, display_height), pygame.RESIZABLE)
 screen_surf = game_display.get_rect()
 
-def text_objects(text, font, color=black):
+def text_objects(text, font, color=BLACK):
     text_surface = font.render(text, True, color)
     return text_surface, text_surface.get_rect()
 
@@ -53,14 +53,14 @@ def fade(width, height, delay):
     delay: the delay in milliseconds between blits
     """
     fade = pygame.Surface((width, height))
-    fade.fill(black)
+    fade.fill(BLACK)
     for alpha in range(0, 255):
         fade.set_alpha(alpha)
         game_display.blit(fade, (0,0))
         pygame.display.update()
         pygame.time.delay(delay)
 
-def blit_text(surface, text, pos, font, size, buffer, color=black, fade=False, display_delay=3000, fade_delay=10):
+def blit_text(surface, text, pos, font, size, buffer, color=BLACK, fade=False, display_delay=3000, fade_delay=10):
     """
     Function for blitting blocks of text. Includes a word wrapping feature to
     ensure contents stays within the screen boundaries. Also includes an
@@ -117,7 +117,7 @@ def blit_text(surface, text, pos, font, size, buffer, color=black, fade=False, d
 
     if fade == True:
         for alpha in range(255):
-            surface.fill(black)
+            surface.fill(BLACK)
             temp_surface.set_alpha(0 + alpha)
             surface.blit(temp_surface, (0, 0))
             pygame.display.update()
@@ -126,7 +126,7 @@ def blit_text(surface, text, pos, font, size, buffer, color=black, fade=False, d
         pygame.time.delay(display_delay)
 
         for alpha2 in range(255):
-            surface.fill(black)
+            surface.fill(BLACK)
             temp_surface.set_alpha(255 - alpha2)
             surface.blit(temp_surface, (0, 0))
             pygame.display.update()
@@ -143,10 +143,10 @@ def game_loop_intro_text():
         game_display,
         text,
         (0, screen_surface[3] / 4),
-        pinyon,
+        PINYON,
         int(screen_surface[2] / 40),
         int((screen_surface[2] / 100) * 5),
-        red,
+        RED,
         True,
         3000,
         5
@@ -162,10 +162,10 @@ def about():
            " country, too?\n\nAs a player, your goal is to trade and pillage your way " \
            "across the Caribbean, amassing your fortune while staying out of the hands of the European authorities!"
 
-    bg_surf = pygame.transform.scale(about_background, (int((screen_surf[2] / 10) * 7), int((screen_surf[3] / 10) * 7)))
+    bg_surf = pygame.transform.scale(ABOUT_BACKGROUND, (int((screen_surf[2] / 10) * 7), int((screen_surf[3] / 10) * 7)))
     bg_rect = bg_surf.get_rect()
 
-    blit_text(bg_surf, text, (0, bg_rect[3] / 8 * 1), respira, int(screen_surf[2] / 60), int((screen_surf[2] / 100) * 5))
+    blit_text(bg_surf, text, (0, bg_rect[3] / 8 * 1), RESPIRA, int(screen_surf[2] / 60), int((screen_surf[2] / 100) * 5))
     game_display.blit(bg_surf, (screen_surf[2] / 85, (screen_surf[3] / 100) * 22))
 
 def quit_game():
@@ -174,21 +174,21 @@ def quit_game():
 
 def game_intro():
     intro = True
-    game_display.blit(pygame.transform.scale(intro_background, (info_object.current_w, info_object.current_h)), (0, 0))
+    game_display.blit(pygame.transform.scale(INTRO_BACKGROUND, (info_object.current_w, info_object.current_h)), (0, 0))
     screen_surface = game_display.get_rect()
     button_x = (screen_surface[2] / 100) * 70
     button_w = (screen_surface[2] / 100) * 20
     button_h = (screen_surface[3] / 100) * 10
     button_font_size = int((screen_surface[2] / 100) * 2.5)
-    button_rect = close_button_img.get_rect()
+    button_rect = CLOSE_BUTTON_IMG.get_rect()
 
     play_button = MenuButton(
         button_x,
         (screen_surface[3] / 100) * 25,
         button_w,
         button_h,
-        button_background,
-        pirata,
+        MENU_BUTTON_BACKGROUND,
+        PIRATA,
         button_font_size,
         'Cast Off!',
         game_loop
@@ -198,8 +198,8 @@ def game_intro():
         (screen_surface[3] / 100) * 36,
         button_w,
         button_h,
-        button_background,
-        pirata,
+        MENU_BUTTON_BACKGROUND,
+        PIRATA,
         button_font_size,
         'About',
         about
@@ -209,8 +209,8 @@ def game_intro():
         (screen_surface[3] / 100) * 47,
         button_w,
         button_h,
-        button_background,
-        pirata,
+        MENU_BUTTON_BACKGROUND,
+        PIRATA,
         button_font_size,
         'Quit',
         quit_game
@@ -220,7 +220,7 @@ def game_intro():
         (screen_surface[3] / 100) * 76,
         button_rect[2],
         button_rect[3],
-        close_button_img,
+        CLOSE_BUTTON_IMG,
         action=game_intro
     )
     buttons = [play_button, about_button, quit_button, close_button]
@@ -247,10 +247,10 @@ def game_intro():
 
 
         # Sets the font size as a percentage of the screen width to make it dynamic
-        small_text = pygame.font.Font(pirata, int(screen_surface[2] / 50))
-        large_text = pygame.font.Font(pirata, int(screen_surface[2] / 10))
-        title_surf, title_rect = text_objects('Libertalia', large_text, black)
-        footer_surf, footer_rect = text_objects('© Pangaea Studios 2018', small_text, black)
+        small_text = pygame.font.Font(PIRATA, int(screen_surface[2] / 50))
+        large_text = pygame.font.Font(PIRATA, int(screen_surface[2] / 10))
+        title_surf, title_rect = text_objects('Libertalia', large_text, BLACK)
+        footer_surf, footer_rect = text_objects('© Pangaea Studios 2018', small_text, BLACK)
         title_rect.center = ((screen_surface[2] / 1.3), (screen_surface[3] / 8))
         footer_rect.center = ((screen_surface[2] / 10), (screen_surface[3] / 10 * 9.5))
         game_display.blits(blit_sequence=((title_surf, title_rect), (footer_surf, footer_rect)))
@@ -276,9 +276,9 @@ def character_creation():
     nation_y = (screen_surf[3] / 100) * 40.5
     nation_font_size = screen_surf[2] / 60
 
-    name_input = InputBox(input_x, (screen_surf[3] / 100) * 30, input_width, input_height, pirata, input_font_size)
-    age_input = InputBox(input_x, (screen_surf[3] / 100) * 35, input_width, input_height, pirata, input_font_size)
-    ship_name_input = InputBox(input_x, (screen_surf[3] / 100) * 45, input_width, input_height, pirata, input_font_size)
+    name_input = InputBox(input_x, (screen_surf[3] / 100) * 30, input_width, input_height, PIRATA, input_font_size)
+    age_input = InputBox(input_x, (screen_surf[3] / 100) * 35, input_width, input_height, PIRATA, input_font_size)
+    ship_name_input = InputBox(input_x, (screen_surf[3] / 100) * 45, input_width, input_height, PIRATA, input_font_size)
     input_boxes = [name_input, age_input, ship_name_input]
 
     def next_screen():
@@ -292,7 +292,7 @@ def character_creation():
 
     british = NationSelect((screen_surf[2] / 100) * 42,
                            nation_y,
-                           pirata,
+                           PIRATA,
                            'British',
                            nation_font_size,
                            'british',
@@ -300,7 +300,7 @@ def character_creation():
 
     dutch = NationSelect((screen_surf[2] / 100) * 47.5,
                          nation_y,
-                         pirata,
+                         PIRATA,
                          'Dutch',
                          nation_font_size,
                          'dutch',
@@ -308,7 +308,7 @@ def character_creation():
 
     spanish = NationSelect((screen_surf[2] / 100) * 52.5,
                            nation_y,
-                           pirata,
+                           PIRATA,
                            'Spanish',
                            nation_font_size,
                            'spanish',
@@ -316,7 +316,7 @@ def character_creation():
 
     french = NationSelect((screen_surf[2] / 100) * 59,
                           nation_y,
-                          pirata,
+                          PIRATA,
                           'French',
                           nation_font_size,
                           'french',
@@ -327,19 +327,19 @@ def character_creation():
                          (screen_surf[3] / 100) * 77,
                          (screen_surf[2] / 100) * 7,
                          (screen_surf[3] / 100) * 5,
-                         skel_hand_right,
+                         SKEL_HAND_RIGHT,
                          action=next_screen
-    )
+                         )
 
-    header_text = pygame.font.Font(pirata, int(screen_surf[2] / 25))
-    label_text = pygame.font.Font(pirata, int(screen_surf[2] / 50))
-    header = header_text.render('Character Creation', 0, black)
+    header_text = pygame.font.Font(PIRATA, int(screen_surf[2] / 25))
+    label_text = pygame.font.Font(PIRATA, int(screen_surf[2] / 50))
+    header = header_text.render('Character Creation', 0, BLACK)
     header_rect = header.get_rect()
 
-    name = label_text.render('Pirate Name:', 0, black)
-    age = label_text.render('Age:', 0, black)
-    nationality = label_text.render('Nationality:', 0, black)
-    ship_name = label_text.render('Ship Name:', 0, black)
+    name = label_text.render('Pirate Name:', 0, BLACK)
+    age = label_text.render('Age:', 0, BLACK)
+    nationality = label_text.render('Nationality:', 0, BLACK)
+    ship_name = label_text.render('Ship Name:', 0, BLACK)
 
     run = True
     while run:
@@ -348,9 +348,9 @@ def character_creation():
         # measurement populated to work with in accordance with its logic to change the color of the text to red or black.
         # Running the handler first means it's looking for a txt_rect measurement that doesn't yet exist - causing errors
 
-        game_display.blit(wood_background, (0, 0))
+        game_display.blit(CHAR_CREATION_BACKGROUND, (0, 0))
         game_display.blit(
-            pygame.transform.scale(char_background, (int(screen_surf[2] / 4 * 2), int(screen_surf[3] / 100 * 90))),
+            pygame.transform.scale(CHAR_CREATION_SCROLL, (int(screen_surf[2] / 4 * 2), int(screen_surf[3] / 100 * 90))),
             (screen_surf[2] / 4, screen_surf[3] / 100 * 5)
         )
         game_display.blit(header, (screen_surf[2] / 2 - header_rect[2] / 2, screen_surf[3] / 100 * 18))
